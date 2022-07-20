@@ -1,0 +1,58 @@
+#
+# Kubernetes container based limit checks
+#
+
+#
+# These set of rules primarily apply to the version 1 of the API spec (including v1Beta) and 
+# the kind of document is a 'Pod'
+#
+rule version_and_kind_match 
+{
+    apiVersion == /v1/
+    kind == 'Pod'
+}
+
+#
+# For the 'Pod' document ensure that containers have resource limits set 
+# for memory
+#
+rule ensure_container_has_memory_limits when version_and_kind_match 
+{
+    spec.containers[*] 
+    {
+       resources.limits 
+       {
+            #
+            # Ensure that memory attribute is set
+            #
+            memory exists 
+            <<
+                Id: K8S_REC_22
+                Description: Memory limit must be set for the container
+            >>
+        }
+   }
+
+}
+
+#
+# For the 'Pod' document ensure that containers have resource limits set 
+# for cpu
+#
+rule ensure_container_has_cpu_limits when version_and_kind_match 
+{
+    spec.containers[*] 
+    {
+       resources.limits 
+       {
+            #
+            # Ensure that cpu attribute is set
+            #
+            cpu exists 
+            <<
+                Id: K8S_REC_24
+                Description: Cpu limit must be set for the container
+            >>
+       }
+   }
+}
